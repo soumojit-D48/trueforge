@@ -295,6 +295,19 @@ function createTurnResolver(deps: {
 }
 
 /**
+ * Caps a title at {@link MAX_SESSION_TITLE_LENGTH} UTF-16 units without splitting a
+ * surrogate pair: a cut landing on a high surrogate backs off one unit.
+ */
+function truncateSessionTitle(title: string): string {
+  const truncated = title.slice(0, MAX_SESSION_TITLE_LENGTH);
+  const last = truncated.charCodeAt(truncated.length - 1);
+  if (truncated.length > 0 && last >= 0xd800 && last <= 0xdbff) {
+    return truncated.slice(0, -1);
+  }
+  return truncated;
+}
+
+/**
  * Derives a session title from the first user message of the first turn. Returns the
  * trimmed text (capped at {@link MAX_SESSION_TITLE_LENGTH}) or `undefined` when no usable
  * text is present (e.g. file-only or tool-approval input).
@@ -317,7 +330,7 @@ export function deriveSessionTitle(input: TurnInputItem[] | undefined): string |
   if (!trimmed) {
     return undefined;
   }
-  return trimmed.slice(0, MAX_SESSION_TITLE_LENGTH);
+  return truncateSessionTitle(trimmed);
 }
 
 /**
