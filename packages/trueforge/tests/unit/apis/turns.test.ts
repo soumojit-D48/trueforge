@@ -68,6 +68,21 @@ describe('turns', () => {
       const title = deriveSessionTitle(userMessage(`${'a'.repeat(49)}😀 and more`));
       expect(title).toBe('a'.repeat(49));
     });
+
+    it('drops a skin-tone cluster that would cross the cap instead of keeping its base', () => {
+      const title = deriveSessionTitle(userMessage(`${'x'.repeat(48)}👋🏽 and more`));
+      expect(title).toBe('x'.repeat(48));
+    });
+
+    it('keeps a skin-tone cluster that fits exactly inside the cap', () => {
+      const text = `${'y'.repeat(46)}👋🏽`;
+      expect(deriveSessionTitle(userMessage(text))).toBe(text);
+    });
+
+    it('drops a ZWJ sequence that would cross the cap', () => {
+      const title = deriveSessionTitle(userMessage(`${'z'.repeat(44)}👨‍👩‍👧‍👦 and more`));
+      expect(title).toBe('z'.repeat(44));
+    });
   });
 
   describe('turn ownership', () => {
