@@ -294,15 +294,23 @@ function createTurnResolver(deps: {
   });
 }
 
+/** Grapheme segmentation for title truncation (locale-independent per UAX #29). */
+const titleSegmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+
 /**
  * Caps a title at {@link MAX_SESSION_TITLE_LENGTH} UTF-16 units without splitting a
- * surrogate pair: a cut landing on a high surrogate backs off one unit.
+ * grapheme cluster: clusters that would cross the cap (emoji with skin tones or
+ * ZWJ sequences, which read as one unit but span several) are dropped whole.
  */
 function truncateSessionTitle(title: string): string {
-  const truncated = title.slice(0, MAX_SESSION_TITLE_LENGTH);
-  const last = truncated.charCodeAt(truncated.length - 1);
-  if (truncated.length > 0 && last >= 0xd800 && last <= 0xdbff) {
-    return truncated.slice(0, -1);
+  let truncated = '';
+  let length = 0;
+  for (const { segment } of titleSegmenter.segment(title)) {
+    if (length + segment.length > MAX_SESSION_TITLE_LENGTH) {
+      break;
+    }
+    truncated += segment;
+    length += segment.length;
   }
   return truncated;
 }
