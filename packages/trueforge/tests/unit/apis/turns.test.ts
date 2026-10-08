@@ -83,6 +83,10 @@ describe('turns', () => {
       const title = deriveSessionTitle(userMessage(`${'z'.repeat(44)}👨‍👩‍👧‍👦 and more`));
       expect(title).toBe('z'.repeat(44));
     });
+
+    it('returns undefined when a single cluster exceeds the cap', () => {
+      expect(deriveSessionTitle(userMessage(`e${'\u0301'.repeat(60)}`))).toBeUndefined();
+    });
   });
 
   describe('turn ownership', () => {
