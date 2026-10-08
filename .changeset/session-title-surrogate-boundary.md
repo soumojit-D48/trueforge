@@ -2,5 +2,5 @@
 '@truefoundry/trueforge': patch
 ---
 
-Fix derived session titles ending in a lone surrogate when the length cap splits an emoji, which stored
-malformed Unicode.
+Truncate derived session titles on grapheme boundaries so emoji clusters are never split, and leave
+the title unset when nothing fits instead of storing a blank value.
