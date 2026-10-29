@@ -120,9 +120,9 @@ export interface TurnContextAppend {
 export interface CreateTurnInput<TTurnCustom extends object = Record<string, never>> {
   turn: TurnRecordWithoutSnapshot<TTurnCustom>;
   /** Snapshot read before preparation; the store rejects a stale snapshot without cancelling its turn. */
-  expected_previous_snapshot?: TurnSnapshot | undefined;
+  expected_previous_snapshot: TurnSnapshot | undefined;
   /** Persisted atomically if the previous turn is still non-terminal when this turn commits. */
-  previous_turn_done_event?: TurnDoneEvent | undefined;
+  previous_turn_done_event: TurnDoneEvent | undefined;
   /** Threads absent on the previous turn (turn 1: the root thread; else empty). */
   new_threads: NewThreadInit[];
   /**
